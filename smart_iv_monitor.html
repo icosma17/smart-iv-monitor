@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart AI IV System</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:#01030a;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;font-family:'Inter',sans-serif;}
+.wrap{background:#05080f;border-radius:20px;overflow:hidden;width:100%;max-width:820px;border:1.5px solid #0f1f35;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:#070c16;border-bottom:1px solid #0f1f35;}
+.h-left{display:flex;align-items:center;gap:12px;}
+.pulse-ring{width:36px;height:36px;border-radius:50%;background:#0a1829;border:1.5px solid #1a4a8a;display:flex;align-items:center;justify-content:center;}
+.pulse-dot{width:12px;height:12px;border-radius:50%;background:#3b82f6;animation:pulse 1.4s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
+.h-title{font-size:17px;font-weight:600;color:#e2eeff;letter-spacing:.01em;}
+.h-sub{font-size:12px;color:#3b82f6;font-weight:500;margin-top:2px;}
+.h-right{display:flex;align-items:center;gap:10px;}
+.chip{padding:5px 13px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.04em;}
+.chip-ai{background:#0f2d5e;color:#60a5fa;border:1px solid #1a4a8a;}
+.chip-live{background:#082215;color:#34d399;border:1px solid #064020;}
+.clk{font-size:13px;color:#334155;font-weight:500;}
+.vitals-row{display:grid;grid-template-columns:repeat(4,1fr);background:#07101d;border-bottom:1px solid #0f1f35;}
+.vcard{padding:18px 20px;border-right:1px solid #0f1f35;position:relative;}
+.vcard:last-child{border-right:none;}
+.vc-label{font-size:10px;color:#3b5270;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;}
+.vc-val{font-size:36px;font-weight:300;color:#e2eeff;line-height:1;letter-spacing:-.02em;}
+.vc-unit{font-size:11px;color:#3b5270;margin-top:4px;font-weight:500;}
+.vc-tag{display:inline-block;margin-top:7px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;}
+.tag-ok{background:#082215;color:#34d399;border:1px solid #064020;}
+.tag-warn{background:#1c1100;color:#fbbf24;border:1px solid #3d2600;}
+.tag-bad{background:#1c0505;color:#f87171;border:1px solid #3d0a0a;}
+.vc-accent{position:absolute;top:0;left:0;width:3px;height:100%;}
+.acc-green{background:#059669;} .acc-blue{background:#3b82f6;} .acc-amber{background:#f59e0b;}
+.ecg-section{background:#05080f;padding:10px 24px;border-bottom:1px solid #0f1f35;}
+.ecg-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.ecg-lbl{font-size:10px;color:#3b5270;font-weight:600;letter-spacing:.07em;text-transform:uppercase;}
+.ecg-bpm{font-size:13px;color:#34d399;font-weight:600;}
+canvas{display:block;width:100%;}
+.main-grid{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #0f1f35;}
+.panel{padding:20px 22px;border-right:1px solid #0f1f35;}
+.panel:last-child{border-right:none;}
+.panel-title{font-size:10px;color:#3b5270;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px;}
+.flow-num{font-size:52px;font-weight:200;color:#60a5fa;line-height:1;letter-spacing:-.03em;}
+.flow-unit{font-size:12px;color:#3b5270;margin-top:2px;font-weight:500;}
+.med-tag{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:6px 14px;border-radius:20px;background:#0f2d5e;border:1px solid #1a4a8a;}
+.med-dot{width:7px;height:7px;border-radius:50%;background:#60a5fa;}
+.med-name{font-size:12px;color:#93c5fd;font-weight:500;}
+.bar-section{margin-top:16px;}
+.bar-row{margin-bottom:12px;}
+.bar-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.bar-lbl{font-size:11px;color:#3b5270;font-weight:500;}
+.bar-val{font-size:11px;font-weight:600;}
+.track{height:5px;background:#0f1f35;border-radius:3px;overflow:hidden;}
+.fill{height:100%;border-radius:3px;transition:width .5s ease;}
+.fill-blue{background:#3b82f6;} .fill-green{background:#10b981;} .fill-purple{background:#8b5cf6;}
+.log-area{margin-top:16px;border-radius:10px;border:1px solid #0f1f35;background:#03060b;padding:10px 14px;max-height:100px;overflow-y:auto;}
+.log-title{font-size:10px;color:#3b5270;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px;}
+.log-item{font-size:11px;color:#334155;line-height:1.9;}
+.log-item b{color:#4e6a8a;font-weight:500;}
+.status-card{border-radius:12px;padding:14px 16px;border:1px solid;margin-bottom:12px;}
+.sc-ok{background:#040f08;border-color:#064020;}
+.sc-warn{background:#0c0900;border-color:#3d2600;}
+.sc-bad{background:#0c0202;border-color:#3d0a0a;}
+.sc-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.sc-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sc-icon svg{width:15px;height:15px;}
+.sc-title{font-size:14px;font-weight:600;}
+.sc-body{font-size:12px;color:#475569;line-height:1.6;padding-left:40px;}
+.ai-card{background:#060f1e;border:1px solid #0f2d5e;border-radius:12px;padding:14px 16px;}
+.ai-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.ai-orb{width:26px;height:26px;border-radius:50%;background:#1a4a8a;display:flex;align-items:center;justify-content:center;}
+.ai-orb svg{width:13px;height:13px;fill:#60a5fa;}
+.ai-label{font-size:10px;color:#3b82f6;font-weight:700;letter-spacing:.07em;text-transform:uppercase;}
+.ai-body{font-size:12px;color:#4e6a8a;line-height:1.7;}
+.controls{background:#070c16;border-top:1px solid #0f1f35;padding:18px 22px;}
+.ctrl-title{font-size:10px;color:#3b5270;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px;}
+.sliders-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px;}
+.sl-item label{font-size:10px;color:#3b5270;font-weight:600;letter-spacing:.06em;text-transform:uppercase;display:flex;justify-content:space-between;margin-bottom:5px;}
+.sl-item label em{color:#93c5fd;font-style:normal;font-weight:600;}
+.sl-item input[type=range]{width:100%;-webkit-appearance:none;height:4px;border-radius:2px;background:#0f1f35;outline:none;}
+.sl-item input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#3b82f6;cursor:pointer;border:2px solid #1a4a8a;}
+.divider{height:1px;background:#0f1f35;margin:14px 0;}
+.med-title{font-size:10px;color:#3b5270;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;}
+.med-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+.m-btn{padding:8px 4px;border-radius:10px;font-size:11px;font-weight:600;cursor:pointer;text-align:center;border:1px solid #0f1f35;background:#07101d;color:#3b5270;transition:all .15s;letter-spacing:.02em;}
+.m-btn:hover{border-color:#1a4a8a;color:#60a5fa;}
+.m-btn.sel{background:#0f2d5e;color:#93c5fd;border-color:#1a4a8a;}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;}
+.btn{padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:none;letter-spacing:.02em;transition:opacity .15s;}
+.btn:hover{opacity:.82;}
+.btn-assess{background:#1a4a8a;color:#e2eeff;}
+.btn-emergency{background:#7f1d1d;color:#fecaca;}
+.btn-stable{background:#064020;color:#a7f3d0;}
+.btn-refill{background:#0f1f35;color:#60a5fa;border:1px solid #1a4a8a;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="header">
+  <div class="h-left">
+    <div class="pulse-ring"><div class="pulse-dot"></div></div>
+    <div>
+      <div class="h-title">Smart AI IV System</div>
+      <div class="h-sub">Patient: Jordan Smith &nbsp;·&nbsp; Bed 4A &nbsp;·&nbsp; ICU</div>
+    </div>
+  </div>
+  <div class="h-right">
+    <div class="chip chip-live">Live</div>
+    <div class="chip chip-ai">AI Active</div>
+    <div class="clk" id="clk"></div>
+  </div>
+</div>
+
+<div class="vitals-row">
+  <div class="vcard">
+    <div class="vc-accent acc-green"></div>
+    <div class="vc-label">Heart rate</div>
+    <div class="vc-val" id="hr-v">72</div>
+    <div class="vc-unit">beats / min</div>
+    <div class="vc-tag tag-ok" id="hr-tag">Normal</div>
+  </div>
+  <div class="vcard">
+    <div class="vc-accent acc-blue"></div>
+    <div class="vc-label">Blood pressure</div>
+    <div class="vc-val" id="bp-v">118<span style="font-size:18px;color:#3b5270;font-weight:300;"> /76</span></div>
+    <div class="vc-unit">mmHg systolic / diastolic</div>
+    <div class="vc-tag tag-ok" id="bp-tag">Normal</div>
+  </div>
+  <div class="vcard">
+    <div class="vc-accent acc-blue"></div>
+    <div class="vc-label">Oxygen SpO₂</div>
+    <div class="vc-val" id="spo2-v">98</div>
+    <div class="vc-unit">percent saturation</div>
+    <div class="vc-tag tag-ok" id="spo2-tag">Optimal</div>
+  </div>
+  <div class="vcard">
+    <div class="vc-accent acc-amber"></div>
+    <div class="vc-label">Temperature</div>
+    <div class="vc-val" id="temp-v">98.6</div>
+    <div class="vc-unit">degrees Fahrenheit</div>
+    <div class="vc-tag tag-ok" id="temp-tag">Normal</div>
+  </div>
+</div>
+
+<div class="ecg-section">
+  <div class="ecg-header">
+    <span class="ecg-lbl">ECG — live waveform</span>
+    <span class="ecg-bpm" id="ecg-bpm">72 bpm</span>
+  </div>
+  <canvas id="ecg" height="52"></canvas>
+</div>
+
+<div class="main-grid">
+  <div class="panel">
+    <div class="panel-title">Infusion control</div>
+    <div class="flow-num" id="flow-v">25</div>
+    <div class="flow-unit">mL per hour</div>
+    <div class="med-tag">
+      <div class="med-dot" id="med-dot"></div>
+      <div class="med-name" id="med-name">Normal saline</div>
+    </div>
+    <div class="bar-section">
+      <div class="bar-row">
+        <div class="bar-top"><span class="bar-lbl">Bag level</span><span class="bar-val" style="color:#60a5fa;" id="bag-pct">72%</span></div>
+        <div class="track"><div class="fill fill-blue" id="bag-bar" style="width:72%;"></div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-top"><span class="bar-lbl">Drip rate</span><span class="bar-val" style="color:#10b981;" id="drip-v">8 drops/min</span></div>
+        <div class="track"><div class="fill fill-green" id="drip-bar" style="width:25%;"></div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-top"><span class="bar-lbl">Catheter pressure</span><span class="bar-val" style="color:#8b5cf6;" id="pres-v">18 mmHg</span></div>
+        <div class="track"><div class="fill fill-purple" id="pres-bar" style="width:45%;"></div></div>
+      </div>
+    </div>
+    <div class="log-area">
+      <div class="log-title">Event log</div>
+      <div id="log">
+        <div class="log-item"><b>09:00</b> — System online. Patient connected.</div>
+        <div class="log-item"><b>09:01</b> — Baseline vitals recorded, all normal.</div>
+        <div class="log-item"><b>09:02</b> — Saline infusion started at 25 mL/hr.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">AI status</div>
+    <div class="status-card sc-ok" id="status-card">
+      <div class="sc-row">
+        <div class="sc-icon" id="sc-icon" style="background:#064020;">
+          <svg viewBox="0 0 14 14" fill="none" stroke="#34d399" stroke-width="1.5" stroke-linecap="round"><path d="M2 7l3.5 3.5L12 3"/></svg>
+        </div>
+        <div class="sc-title" id="sc-title" style="color:#34d399;">All systems stable</div>
+      </div>
+      <div class="sc-body" id="sc-body">All vitals within normal range. No intervention required at this time.</div>
+    </div>
+    <div class="ai-card">
+      <div class="ai-row">
+        <div class="ai-orb">
+          <svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="4"/><path d="M4 6h4M6 4v4" stroke="white" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg>
+        </div>
+        <span class="ai-label">AI Recommendation</span>
+      </div>
+      <div class="ai-body" id="ai-body">Vitals stable. Maintaining current infusion at 25 mL/hr. Next scheduled check in 15 minutes.</div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="ctrl-title">Patient vitals simulator</div>
+  <div class="sliders-grid">
+    <div class="sl-item"><label>Systolic BP <em id="lb">118</em></label><input type="range" min="90" max="200" value="118" step="1" id="sl-bp" oninput="upd()"></div>
+    <div class="sl-item"><label>Heart rate <em id="lh">72</em></label><input type="range" min="40" max="160" value="72" step="1" id="sl-hr" oninput="upd()"></div>
+    <div class="sl-item"><label>SpO₂ % <em id="ls">98</em></label><input type="range" min="85" max="100" value="98" step="1" id="sl-s2" oninput="upd()"></div>
+    <div class="sl-item"><label>Temperature °F <em id="lt">98.6</em></label><input type="range" min="960" max="1060" value="986" step="1" id="sl-t" oninput="upd()"></div>
+    <div class="sl-item"><label>Flow rate mL/hr <em id="lf">25</em></label><input type="range" min="5" max="200" value="25" step="5" id="sl-fl" oninput="upd()"></div>
+    <div class="sl-item"><label>Pressure mmHg <em id="lp">18</em></label><input type="range" min="5" max="40" value="18" step="1" id="sl-pr" oninput="upd()"></div>
+  </div>
+  <div class="divider"></div>
+  <div class="med-title">Select medication</div>
+  <div class="med-grid">
+    <div class="m-btn sel" id="mb0" onclick="pickMed(0)">Normal saline</div>
+    <div class="m-btn" id="mb1" onclick="pickMed(1)">Nicardipine</div>
+    <div class="m-btn" id="mb2" onclick="pickMed(2)">Labetalol</div>
+    <div class="m-btn" id="mb3" onclick="pickMed(3)">Dopamine</div>
+    <div class="m-btn" id="mb4" onclick="pickMed(4)">Morphine</div>
+    <div class="m-btn" id="mb5" onclick="pickMed(5)">Heparin</div>
+    <div class="m-btn" id="mb6" onclick="pickMed(6)">Potassium Cl</div>
+    <div class="m-btn" id="mb7" onclick="pickMed(7)">Insulin drip</div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-assess" onclick="assess()">Run AI assessment</button>
+    <button class="btn btn-emergency" onclick="emergency()">Emergency alert</button>
+    <button class="btn btn-stable" onclick="stabilize()">Stabilize patient</button>
+    <button class="btn btn-refill" onclick="refill()">Refill bag</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+const meds=['Normal saline','Nicardipine','Labetalol','Dopamine','Morphine','Heparin','Potassium Cl','Insulin drip'];
+const medColors=['#60a5fa','#f87171','#fbbf24','#34d399','#c084fc','#fb923c','#38bdf8','#a78bfa'];
+let curMed=0,bpmV=72;
+
+function pickMed(i){
+  curMed=i;
+  for(let j=0;j<8;j++) document.getElementById('mb'+j).className='m-btn'+(j===i?' sel':'');
+  document.getElementById('med-name').textContent=meds[i];
+  document.getElementById('med-dot').style.background=medColors[i];
+  addLog('Medication changed to '+meds[i]+'.');
+}
+
+function upd(){
+  const bp=+document.getElementById('sl-bp').value;
+  const hr=+document.getElementById('sl-hr').value;
+  const s2=+document.getElementById('sl-s2').value;
+  const tmp=+document.getElementById('sl-t').value/10;
+  const fl=+document.getElementById('sl-fl').value;
+  const pr=+document.getElementById('sl-pr').value;
+  bpmV=hr;
+  document.getElementById('lb').textContent=bp;
+  document.getElementById('lh').textContent=hr;
+  document.getElementById('ls').textContent=s2;
+  document.getElementById('lt').textContent=tmp.toFixed(1);
+  document.getElementById('lf').textContent=fl;
+  document.getElementById('lp').textContent=pr;
+  document.getElementById('hr-v').textContent=hr;
+  document.getElementById('bp-v').innerHTML=bp+'<span style="font-size:18px;color:#3b5270;font-weight:300;"> /'+Math.round(bp*.63)+'</span>';
+  document.getElementById('spo2-v').textContent=s2;
+  document.getElementById('temp-v').textContent=tmp.toFixed(1);
+  document.getElementById('flow-v').textContent=fl;
+  document.getElementById('drip-v').textContent=Math.round(fl/3)+' drops/min';
+  document.getElementById('drip-bar').style.width=Math.min(100,Math.round(fl/2))+'%';
+  document.getElementById('pres-v').textContent=pr+' mmHg';
+  document.getElementById('pres-bar').style.width=Math.round(pr/40*100)+'%';
+  document.getElementById('ecg-bpm').textContent=hr+' bpm';
+  setTag('hr-tag',hr<50||hr>120?'bad':hr>100?'warn':'ok',hr<50?'Bradycardia':hr>120?'Tachycardia':hr>100?'Elevated':'Normal');
+  setTag('bp-tag',bp>=180?'bad':bp>=140?'warn':'ok',bp>=180?'Crisis':bp>=140?'Hypertension':bp>=120?'Elevated':'Normal');
+  setTag('spo2-tag',s2<90?'bad':s2<95?'warn':'ok',s2<90?'Critical':s2<95?'Low':'Optimal');
+  setTag('temp-tag',tmp>102?'bad':tmp>100.4?'warn':'ok',tmp>102?'High fever':tmp>100.4?'Fever':tmp<96.5?'Hypothermia':'Normal');
+}
+
+function setTag(id,type,label){
+  const el=document.getElementById(id);
+  el.textContent=label;
+  el.className='vc-tag '+(type==='ok'?'tag-ok':type==='warn'?'tag-warn':'tag-bad');
+}
+
+function assess(){
+  const bp=+document.getElementById('sl-bp').value;
+  const hr=+document.getElementById('sl-hr').value;
+  const s2=+document.getElementById('sl-s2').value;
+  const tmp=+document.getElementById('sl-t').value/10;
+  const fl=+document.getElementById('sl-fl').value;
+  let sc,sit,sib,sic,ait;
+  if(bp>=180||s2<90||hr>130||hr<45||tmp>102){
+    sc='sc-bad';sit='#f87171';sib='Critical — immediate action required';sic='background:#3d0a0a;';
+    ait='Critical vitals detected. Emergency protocol initiated. Escalating to rapid IV medication. Clinical team alerted. Monitoring every 90 seconds.';
+  } else if(bp>=140||hr>105||s2<95||tmp>100.4){
+    sc='sc-warn';sit='#fbbf24';sib='Caution — adjusting infusion';sic='background:#3d2600;';
+    ait='Borderline readings detected. Infusion rate adjusted accordingly. Reassess in 10 minutes. Trend monitoring active.';
+  } else {
+    sc='sc-ok';sit='#34d399';sib='All systems stable';sic='background:#064020;';
+    ait='Vitals stable. Maintaining current infusion at '+fl+' mL/hr. Next scheduled check in 15 minutes.';
+  }
+  document.getElementById('status-card').className='status-card '+sc;
+  document.getElementById('sc-icon').style.cssText=sic;
+  document.getElementById('sc-title').style.color=sit;
+  document.getElementById('sc-title').textContent=sib;
+  document.getElementById('sc-body').textContent=bp>=180||s2<90||hr>130?'Critical values detected — AI has escalated care and notified the clinical team.':bp>=140?'Abnormal readings detected. AI has adjusted medication and flow rate.':'All vitals within normal range. No intervention required at this time.';
+  document.getElementById('ai-body').textContent=ait;
+  const p=Math.max(5,parseInt(document.getElementById('bag-pct').textContent)-4);
+  document.getElementById('bag-bar').style.width=p+'%';
+  document.getElementById('bag-pct').textContent=p+'%';
+  addLog('AI assessment complete. Status: '+sib+'.');
+}
+
+function emergency(){
+  document.getElementById('sl-bp').value=192;
+  document.getElementById('sl-hr').value=136;
+  document.getElementById('sl-s2').value=87;
+  document.getElementById('sl-t').value=1034;
+  upd(); assess(); pickMed(1);
+  addLog('EMERGENCY triggered. Nicardipine initiated immediately.');
+}
+
+function stabilize(){
+  document.getElementById('sl-bp').value=118;
+  document.getElementById('sl-hr').value=72;
+  document.getElementById('sl-s2').value=98;
+  document.getElementById('sl-t').value=986;
+  upd(); assess(); pickMed(0);
+  addLog('Patient stabilized. All vitals returned to normal.');
+}
+
+function refill(){
+  document.getElementById('bag-bar').style.width='100%';
+  document.getElementById('bag-pct').textContent='100%';
+  addLog('IV bag replaced — 500 mL loaded.');
+}
+
+function addLog(msg){
+  const t=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  const d=document.createElement('div');
+  d.className='log-item';
+  d.innerHTML='<b>'+t+'</b> — '+msg;
+  document.getElementById('log').appendChild(d);
+  const lw=document.querySelector('.log-area');
+  lw.scrollTop=lw.scrollHeight;
+}
+
+setInterval(()=>{document.getElementById('clk').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});},1000);
+document.getElementById('clk').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+
+const cv=document.getElementById('ecg'),cx=cv.getContext('2d');
+let pts=[],ex=0;
+function ecgPt(x){const c=Math.round(60/bpmV*55),p=x%c;return p<2?26:p===3?21:p===4?5:p===5?48:p===6?8:p===7?20:p<=9?24:26;}
+function drawECG(){
+  const w=cv.offsetWidth||780;cv.width=w;cv.height=52;
+  pts.push(ecgPt(ex++));
+  if(pts.length>w)pts.shift();
+  cx.clearRect(0,0,w,52);
+  cx.strokeStyle='#34d399';cx.lineWidth=1.8;
+  cx.beginPath();pts.forEach((y,i)=>i===0?cx.moveTo(i,y):cx.lineTo(i,y));
+  cx.stroke();
+}
+setInterval(drawECG,30);
+</script>
+</body>
+</html>
